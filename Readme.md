@@ -102,6 +102,18 @@ This project is designed with:
 
 ## 🛠️ Tech Stack
 
+## Frontend 
+| Technology | Purpose |
+|-----------|---------|
+| **face-api.js** | Real-time face detection |
+| **TensorFlow.js** | ML engine for COCO-SSD |
+| **COCO-SSD** | Detects phones, books, laptops |
+| **Mongoose** | ODM for MongoDB |
+| **EJS** | Templating engine |
+| **CSS / Bootstrap / JS** | Frontend UI styling |
+| **Express Session / Auth** | Authentication flow |
+
+
 | Technology | Purpose |
 |-----------|---------|
 | **Node.js** | Runtime environment |
