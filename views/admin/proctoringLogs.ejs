@@ -1,0 +1,167 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-0">Proctoring logs</h4>
+      <small class="text-muted"><%= exam.title %></small>
+    </div>
+    <a href="/admin/exams" class="btn btn-sm btn-outline-secondary">Back</a>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Total violations</div>
+        <div class="fs-3 fw-bold"><%= logs.length %></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">No face</div>
+        <div class="fs-3 fw-bold text-danger">
+          <%= logs.filter(l => l.type === 'no_face').length %>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Prohibited object</div>
+        <div class="fs-3 fw-bold text-warning">
+          <%= logs.filter(l => l.type === 'prohibited_object').length %>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center p-3">
+        <div class="text-muted small">Auto-submitted</div>
+        <div class="fs-3 fw-bold text-danger">
+          <%= logs.filter(l => l.warningNum >= 3).length %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter buttons -->
+  <div class="mb-3 d-flex gap-2 flex-wrap">
+    <button class="btn btn-sm btn-dark filter-btn active" data-filter="all">All</button>
+    <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="no_face">No face</button>
+    <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="multiple_faces">Multiple faces</button>
+    <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="prohibited_object">Prohibited object</button>
+    <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="tab_switch">Tab switch</button>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="log-table">
+        <thead class="table-light">
+          <tr>
+            <th>Time</th>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Violation</th>
+            <th>Warning</th>
+            <th>Details</th>
+            <th>Screenshot</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% logs.forEach(log => { %>
+          <tr data-type="<%= log.type %>">
+            <td class="text-muted small font-monospace">
+              <%= new Date(log.timestamp).toLocaleTimeString() %>
+            </td>
+            <td><strong><%= log.userId?.name || 'Unknown' %></strong></td>
+            <td class="text-muted small"><%= log.userId?.email || '—' %></td>
+            <td>
+              <% if (log.type === 'no_face') { %>
+                <span class="badge bg-danger">No face</span>
+              <% } else if (log.type === 'multiple_faces') { %>
+                <span class="badge bg-warning text-dark">Multiple faces</span>
+              <% } else if (log.type === 'prohibited_object') { %>
+                <span class="badge bg-orange" style="background:#e8590c">Object</span>
+              <% } else { %>
+                <span class="badge bg-secondary">Tab switch</span>
+              <% } %>
+            </td>
+            <td>
+              <span class="fw-bold
+                <%= log.warningNum >= 3 ? 'text-danger' : log.warningNum === 2 ? 'text-warning' : 'text-muted' %>">
+                <%= log.warningNum %>/3
+              </span>
+            </td>
+            <td class="small text-muted"><%= log.details %></td>
+            <td>
+              <% if (log.screenshot) { %>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#screenshotModal"
+                   data-src="<%= log.screenshot %>"
+                   data-student="<%= log.userId?.name %>"
+                   data-time="<%= new Date(log.timestamp).toLocaleString() %>">
+                  <img src="<%= log.screenshot %>" width="60" height="44"
+                       style="object-fit:cover;border-radius:4px;border:1px solid #dee2e6"/>
+                </a>
+              <% } else { %>
+                <span class="text-muted">—</span>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-2 text-muted small" id="row-count">
+    Showing <%= logs.length %> records
+  </div>
+</div>
+
+<!-- Screenshot modal -->
+<div class="modal fade" id="screenshotModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h6 class="modal-title" id="modal-student-name">Screenshot</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="modal-img" src="" class="img-fluid rounded" style="max-height:300px"/>
+        <div class="text-muted small mt-2" id="modal-time"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(b => {
+        b.classList.remove("active", "btn-dark");
+        b.classList.add("btn-outline-secondary");
+      });
+      btn.classList.add("active", "btn-dark");
+      btn.classList.remove("btn-outline-secondary");
+
+      const filter = btn.dataset.filter;
+      const rows = document.querySelectorAll("#log-table tbody tr");
+      let visible = 0;
+      rows.forEach(row => {
+        const show = filter === "all" || row.dataset.type === filter;
+        row.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+      document.getElementById("row-count").textContent =
+        `Showing ${visible} of ${rows.length} records`;
+    });
+  });
+
+  document.getElementById("screenshotModal").addEventListener("show.bs.modal", e => {
+    const t = e.relatedTarget;
+    document.getElementById("modal-img").src = t.dataset.src;
+    document.getElementById("modal-student-name").textContent = t.dataset.student;
+    document.getElementById("modal-time").textContent = t.dataset.time;
+  });
+</script>

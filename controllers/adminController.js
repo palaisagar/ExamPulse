@@ -140,7 +140,8 @@ exports.adminDashboard = async (req, res) => {
 
     const announcements = await Announcement.find()
       .populate("createdBy", "name")
-      .sort({ createdAt: -1 }).lean();
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
@@ -216,5 +217,20 @@ exports.deleteAnnouncement = async (req, res) => {
     console.log("DELETE ANNOUNCEMENT ERROR:", err);
     req.flash("error", "Announcement delete failed");
     res.redirect("/admin/dashboard");
+  }
+};
+const ProctoringLog = require("../models/ProctoringLog");
+
+exports.getProctoringLogs = async (req, res) => {
+  try {
+    const exam = await Exam.findById(req.params.examId);
+    const logs = await ProctoringLog.find({ examId: req.params.examId })
+      .populate("userId", "name email")
+      .sort({ timestamp: 1 });
+
+    res.render("admin/proctoringLogs", { exam, logs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong");
   }
 };

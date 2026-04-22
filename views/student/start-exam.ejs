@@ -1,6 +1,11 @@
 <% layout('layouts/boilerplate') %>
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+<script>window.EXAM_ID = "<%= exam._id %>";</script>
+<script src="/js/proctor.js"></script>
 
-<div class="glass-card p-4 exam-wrapper">
+<div class="glass-card p-4 exam-wrapper" style="position:relative">
   <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
     <div>
       <h2 class="fw-bold text-light mb-1"><%= exam.title %></h2>
@@ -53,7 +58,39 @@
             <button type="button" class="palette-btn" data-target="question-<%= index + 1 %>"><%= index + 1 %></button>
           <% }) %>
         </div>
+
+        <!-- Camera box -->
+        <div style="margin-top:20px;text-align:center">
+          <p class="text-light small mb-1">Live Camera</p>
+          <video id="proctor-video" width="100%" autoplay muted
+            style="border-radius:8px;border:2px solid #ccc;"></video>
+          <div id="warning-counter"
+            style="font-size:13px;margin-top:6px;color:red;font-weight:600">
+            Warnings: 0/3
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 </div>
+
+<!-- Warning popup -->
+<div id="warning-popup"
+  style="display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);
+         background:#fff3cd;border:1px solid #e0a800;padding:12px 24px;
+         border-radius:8px;font-weight:500;z-index:9999;max-width:400px;
+         text-align:center;color:#333">
+</div>
+
+<script>
+  (async () => {
+    const video = document.getElementById("proctor-video");
+    await ProctoringSystem.init(video);
+    ProctoringSystem.startMonitoring(video);
+  })();
+
+  document.getElementById("examForm")?.addEventListener("submit", () => {
+    ProctoringSystem.stopMonitoring();
+  });
+</script>

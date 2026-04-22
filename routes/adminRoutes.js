@@ -11,6 +11,7 @@ const {
   approveStudent,
   createAnnouncement,
   deleteAnnouncement,
+  getProctoringLogs,
 } = require("../controllers/adminController");
 
 router.get("/dashboard", protect, allowRoles("admin"), adminDashboard);
@@ -23,8 +24,29 @@ router.post(
 router.post("/exams/:id/approve", protect, allowRoles("admin"), approveExam);
 router.post("/users/:id/delete", protect, allowRoles("admin"), deleteUser);
 router.post("/exams/:id/delete", protect, allowRoles("admin"), deleteExam);
-router.post("/students/:id/approve", protect, allowRoles("admin"), approveStudent);
-router.post("/announcements/create", protect, allowRoles("admin"), createAnnouncement);
-router.post("/announcements/:id/delete", protect, allowRoles("admin"), deleteAnnouncement);
+router.post(
+  "/students/:id/approve",
+  protect,
+  allowRoles("admin"),
+  approveStudent,
+);
+router.post(
+  "/announcements/create",
+  protect,
+  allowRoles("admin"),
+  createAnnouncement,
+);
+router.post(
+  "/announcements/:id/delete",
+  protect,
+  allowRoles("admin"),
+  deleteAnnouncement,
+);
+router.get(
+  "/proctoring/:examId",
+  protect,
+  allowRoles("admin"),
+  getProctoringLogs,
+);
 
 module.exports = router;

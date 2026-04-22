@@ -103,6 +103,7 @@ app.use("/exams", require("./routes/examRoutes"));
 app.use("/attempts", require("./routes/attemptRoutes"));
 app.use("/admin", require("./routes/adminRoutes"));
 app.use("/profile", require("./routes/profileRoutes"));
+app.use("/proctoring", require("./routes/proctoringRoutes"));
 app.use("/", require("./routes/viewRoutes"));
 
 app.use((err, req, res, next) => {
