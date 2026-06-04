@@ -102,27 +102,33 @@ This project is designed with:
 
 ## 🛠️ Tech Stack
 
-## Frontend 
+## Frontend
+
 | Technology | Purpose |
-|-----------|---------|
+|------------|---------|
 | **face-api.js** | Real-time face detection |
 | **TensorFlow.js** | ML engine for COCO-SSD |
 | **COCO-SSD** | Detects phones, books, laptops |
-| **Mongoose** | ODM for MongoDB |
-| **EJS** | Templating engine |
-| **CSS / Bootstrap / JS** | Frontend UI styling |
-| **Express Session / Auth** | Authentication flow |
+| **Camera API** | `getUserMedia()` — webcam access |
+| **Canvas API** | Screenshots on violation |
+| **visibilitychange API** | Tab switch detection |
+| **Vanilla JavaScript** | Detection loop, warnings, popups |
+| **Bootstrap 5** | UI styling |
+| **EJS** | Renders exam and admin views |
 
+## Backend
 
 | Technology | Purpose |
-|-----------|---------|
+|------------|---------|
 | **Node.js** | Runtime environment |
-| **Express.js** | Web framework |
-| **MongoDB** | Database |
-| **Mongoose** | ODM for MongoDB |
-| **EJS** | Templating engine |
-| **CSS / Bootstrap / JS** | Frontend UI styling |
-| **Express Session / Auth** | Authentication flow |
+| **Express.js** | API routes for proctoring |
+| **MongoDB** | Stores violation logs |
+| **Mongoose** | `ProctoringLog` schema and queries |
+| **JWT** | Student session verification |
+| **express-session** | Session management |
+| **connect-mongo** | Sessions stored in MongoDB |
+| **helmet** | HTTP security headers |
+| **nodemon** | Dev server auto-restart |
 
 ---
 
